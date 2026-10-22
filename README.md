@@ -1,5 +1,5 @@
 # Happy Mr Kofix 🎮
-20 free kids games. Plain HTML/CSS/JS (ES modules): no build, no login, no paid services.
+30 free kids games. Plain HTML/CSS/JS (ES modules): no build, no login, no paid services.
 Audio is made with the Web Audio API; pictures are emoji/canvas/SVG.
 
 ## Run locally

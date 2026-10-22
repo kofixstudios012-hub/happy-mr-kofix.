@@ -288,6 +288,88 @@ const puzzle = pics => (b, a) => {
 const jigsaw = puzzle([{ b: ['#7ee0ff', '#c6ffdd'], e: '🏰', x: ['☁️', '⭐'] }, { b: ['#ffd1ff', '#fff3a0'], e: '🚀', x: ['⭐', '🌙'] }, { b: ['#a1ffce', '#faffd1'], e: '🌈', x: ['🌸', '🦋'] }]);
 const animalPuzzle = puzzle([{ b: ['#ffe082', '#ffab91'], e: '🦁', x: ['🌴', '🌼'] }, { b: ['#b9f6ca', '#e1f5fe'], e: '🐼', x: ['🎋', '🌿'] }, { b: ['#b3e5fc', '#e8eaf6'], e: '🐘', x: ['☁️', '💧'] }, { b: ['#80deea', '#0097a7'], e: '🐠', x: ['🫧', '🐚'] }]);
 
+const faceQ = (L, t) => (b, a) => quiz(a, b, () => { const c = pick(L); return { p: `<div class="big">${c[0]}</div>${t}`, ...opts(c[1], L.map(x => x[1])) }; });
+const camq = faceQ([['📷', 'Camera'], ['🔦', 'Flashlight'], ['🎞️', 'Film'], ['🖼️', 'Picture frame'], ['🔋', 'Battery'], ['🎥', 'Video camera'], ['💡', 'Light bulb'], ['🖨️', 'Printer']], 'What is this?');
+const feel = faceQ([['😀', 'Happy'], ['😢', 'Sad'], ['😠', 'Angry'], ['😴', 'Sleepy'], ['😮', 'Surprised'], ['😍', 'Loving']], 'How does this face feel?');
+const odd = (b, a) => quiz(a, b, () => { const [x, y] = shuf(['🍎', '🐶', '🚗', '⭐', '🌸', '🐟', '🎈', '🍌']), o = shuf([x, x, x, y]); return { p: 'Which one is different?', o, a: o.indexOf(y) }; });
+const bigger = (b, a) => quiz(a, b, i => { const m = 10 + i * 8; let x = 1 + R(m), y = 1 + R(m); while (y === x) y = 1 + R(m); const big = R(2); return { p: `<div class="big">${x} or ${y}</div>Which is ${big ? 'bigger' : 'smaller'}?`, o: [x, y], a: (big ? x > y : x < y) ? 0 : 1 }; });
+
+function ttt(b, a) {
+  const g = Array(9).fill(''), L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]; let done = 0;
+  const win = p => L.some(l => l.every(i => g[i] === p));
+  const draw = () => { b.innerHTML = '<p>You are ❌. Beat the computer!</p><div class="t3">' + g.map(v => `<button>${v}</button>`).join('') + '</div>'; b.querySelectorAll('.t3 button').forEach((z, i) => z.onclick = () => mv(i)); };
+  const mv = i => {
+    if (done || g[i]) return; g[i] = '❌'; a.sfx('move');
+    if (win('❌')) { draw(); done = 1; a.score(1); return a.win('You won!'); }
+    const free = () => g.map((v, k) => v ? -1 : k).filter(k => k >= 0);
+    if (!free().length) { draw(); done = 1; return a.over("It's a draw!"); }
+    const tryp = p => free().find(k => { g[k] = p; const r = win(p); g[k] = ''; return r; });
+    g[tryp('⭕') ?? (R(3) ? tryp('❌') : undefined) ?? (g[4] ? undefined : 4) ?? pick(free())] = '⭕'; draw();
+    if (win('⭕')) { done = 1; return a.over('The computer won. Try again!'); }
+    if (!free().length) { done = 1; a.over("It's a draw!"); }
+  };
+  draw();
+}
+function simon(b, a) {
+  const C = ['#ff5252', '#40c4ff', '#69f0ae', '#ffd740'], F = [262, 330, 392, 523]; let seq = [], pos = 0, lock = 1;
+  b.innerHTML = '<p id="sm">Watch, then repeat!</p><div class="sim">' + C.map(c => `<button style="background:${c}"></button>`).join('') + '</div>';
+  const bs = b.querySelectorAll('.sim button'), msg = b.querySelector('#sm');
+  const flash = i => { a.note(F[i], .4, 'triangle', .3); bs[i].classList.add('fl'); a.later(() => bs[i].classList.remove('fl'), 300); };
+  const show = () => { lock = 1; pos = 0; seq.push(R(4)); msg.textContent = 'Watch…'; seq.forEach((s, k) => a.later(() => flash(s), 600 + k * 600)); a.later(() => { lock = 0; msg.textContent = 'Your turn!'; }, 600 + seq.length * 600); };
+  bs.forEach((z, i) => z.onclick = () => {
+    if (lock) return; flash(i);
+    if (i !== seq[pos]) { a.sfx('bad'); return a.over(`You remembered ${seq.length - 1}!`); }
+    if (++pos === seq.length) { a.score(seq.length); a.sfx('good'); a.cheer(); if (seq.length >= 8) return a.win('Amazing memory!'); lock = 1; a.later(show, 900); }
+  });
+  show();
+}
+function mole(b, a) {
+  let s = 0, t = 30; b.innerHTML = '<div class="timer">⏱ 30</div><div class="mg">' + Array(9).fill('<button></button>').join('') + '</div>';
+  const tm = b.firstChild, bs = b.querySelectorAll('.mg button'); let up = -1;
+  bs.forEach((z, i) => z.onclick = () => { if (i === up) { s++; a.score(s); a.sfx('pop'); z.textContent = '💥'; up = -1; } });
+  a.every(() => { bs.forEach(z => z.textContent = ''); up = R(9); bs[up].textContent = '🐹'; }, 850);
+  a.every(() => { tm.textContent = '⏱ ' + --t; if (!t) a.win(`You got ${s}!`); }, 1000);
+}
+function rps(b, a) {
+  let s = 0, r = 0; const E = ['✊', '✋', '✌️'];
+  b.innerHTML = '<div class="big" id="rr">Pick one!</div><div class="opts">' + E.map(e => `<button>${e}</button>`).join('') + '</div><small>Best of 7</small>';
+  b.querySelectorAll('.opts button').forEach((z, i) => z.onclick = () => {
+    if (r >= 7) return; const c = R(3), res = i === c ? 0 : (i - c + 3) % 3 === 1 ? 1 : 2; r++;
+    if (res === 1) { s++; a.score(s); a.sfx('good'); } else a.sfx(res ? 'bad' : 'click');
+    b.querySelector('#rr').textContent = `${E[i]} vs ${E[c]} · ${['Tie!', 'You win! 🎉', 'Try again!'][res]}`;
+    if (r === 7) a.later(() => a.win(`You won ${s} of 7!`), 1200);
+  });
+}
+function snake(b, a) {
+  const N = 15, S = 24, [c, x] = cv(b, N * S, N * S); let sn = [[7, 7], [6, 7]], d = [1, 0], nd = d, f = [11, 7], s = 0, t = 0;
+  const K = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }, turn = v => { if (v[0] !== -d[0] || v[1] !== -d[1]) nd = v; };
+  a.ev(document, 'keydown', e => { if (K[e.key]) { e.preventDefault(); turn(K[e.key]); } });
+  b.insertAdjacentHTML('beforeend', '<div class="dpad"><button data-k="ArrowUp">▲</button><button data-k="ArrowLeft">◀</button><button data-k="ArrowDown">▼</button><button data-k="ArrowRight">▶</button></div>');
+  b.querySelectorAll('.dpad button').forEach(z => z.onclick = () => turn(K[z.dataset.k]));
+  a.loop(dt => {
+    t += dt;
+    if (t > .2) {
+      t = 0; d = nd; const h = [sn[0][0] + d[0], sn[0][1] + d[1]];
+      if (h[0] < 0 || h[1] < 0 || h[0] >= N || h[1] >= N || sn.some(p => p[0] === h[0] && p[1] === h[1])) return a.over(`You ate ${s} apples!`);
+      sn.unshift(h);
+      if (h[0] === f[0] && h[1] === f[1]) { s++; a.score(s); a.sfx('pop'); if (s >= 15) return a.win('Super snake!'); do { f = [R(N), R(N)]; } while (sn.some(p => p[0] === f[0] && p[1] === f[1])); } else sn.pop();
+    }
+    x.clearRect(0, 0, N * S, N * S); x.fillStyle = '#69f0ae'; sn.forEach(p => x.fillRect(p[0] * S + 1, p[1] * S + 1, S - 2, S - 2)); em(x, '🍎', (f[0] + .5) * S, (f[1] + .5) * S, S * .85);
+  });
+}
+function slide(b, a) {
+  let t = [1, 2, 3, 4, 5, 6, 7, 8, 0], e = 8; const ok = () => t.every((v, i) => v === (i + 1) % 9);
+  const draw = () => {
+    b.innerHTML = '<p>Slide the tiles into order!</p><div class="pz" style="grid-template-columns:repeat(3,1fr)">' + t.map(v => `<button style="font-size:2.2rem;background:${v ? '#ffd400' : 'transparent'}">${v || ''}</button>`).join('') + '</div>';
+    b.querySelectorAll('.pz button').forEach((z, i) => z.onclick = () => {
+      const h = t.indexOf(0); if (!(Math.abs(i - h) === 3 || (Math.abs(i - h) === 1 && (i / 3 | 0) === (h / 3 | 0)))) return;
+      [t[h], t[i]] = [t[i], t[h]]; a.sfx('move'); a.score(t.filter((v, k) => v === k + 1).length); draw(); if (ok()) a.win('Puzzle solved!');
+    });
+  };
+  do { for (let i = 0; i < 120; i++) { const k = pick([e - 3, e + 3, e % 3 ? e - 1 : -1, e % 3 < 2 ? e + 1 : -1].filter(k => k >= 0 && k < 9)); [t[e], t[k]] = [t[k], t[e]]; e = k; } } while (ok());
+  draw();
+}
+
 // c: learn | puzzle | action | music.  m: music track
 export default [
   { id: 'bubble-pop', n: 'Bubble Pop', c: 'action', i: '🫧', d: 'Aim, shoot and pop 3 matching bubbles!', m: 'lively', run: bubble },
@@ -310,4 +392,14 @@ export default [
   { id: 'animal-puzzle', n: 'Animal Puzzle', c: 'puzzle', i: '🦁', d: 'Rebuild animal pictures.', m: 'calm', run: animalPuzzle },
   { id: 'happy-math', n: 'Happy Math Challenge', c: 'learn', i: '➕', d: 'Add and subtract.', m: 'learn', run: math },
   { id: 'star-collector', n: 'Star Collector', c: 'action', i: '🚀', d: 'Fly, collect stars, dodge comets.', m: 'energy', run: star },
+  { id: 'tic-tac-toe', n: 'Tic Tac Toe', c: 'puzzle', i: '❌', d: 'Beat the computer!', m: 'calm', run: ttt },
+  { id: 'simon', n: 'Simon Sounds', c: 'music', i: '🎵', d: 'Watch the colors, repeat the tune.', m: null, run: simon },
+  { id: 'whack', n: 'Whack-a-Mole', c: 'action', i: '🐹', d: 'Tap the mole when it pops up!', m: 'lively', run: mole },
+  { id: 'rps', n: 'Rock Paper Scissors', c: 'action', i: '✌️', d: 'Best of 7 against the computer.', m: 'lively', run: rps },
+  { id: 'odd-one', n: 'Odd One Out', c: 'puzzle', i: '🧐', d: 'Which one is different?', m: 'calm', run: odd },
+  { id: 'bigger', n: 'Bigger or Smaller', c: 'learn', i: '⚖️', d: 'Compare two numbers.', m: 'learn', run: bigger },
+  { id: 'snake', n: 'Happy Snake', c: 'action', i: '🐍', d: 'Eat apples and grow long!', m: 'energy', run: snake },
+  { id: 'slide', n: 'Slide Puzzle', c: 'puzzle', i: '🔢', d: 'Slide the tiles into order.', m: 'calm', run: slide },
+  { id: 'photo-quiz', n: 'Photo Quiz', c: 'learn', i: '📷', d: 'Cameras and photo fun!', m: 'learn', run: camq },
+  { id: 'feelings', n: 'Feelings Faces', c: 'learn', i: '😀', d: 'How does this face feel?', m: 'learn', run: feel },
 ];

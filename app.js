@@ -76,7 +76,7 @@ bf.onsubmit = e => {
   e.preventDefault();
   const f = new FormData(bf), n = (f.get('n') || '').trim(), s = f.get('s'), d = f.get('d'), t = (f.get('t') || '').trim();
   if (!n || !s || !d) { $('#err').textContent = 'Please add your name, the service and a date.'; return; }
-  const msg = `Hello Kofix! I would like to book a photography session.\n\nName: ${n}\nService: ${s}\nPreferred date: ${d}\nDetails: ${t || '-'}`;
+  const msg = `Hello Kofix Photography Studio! I would like to book a photography session.\n\nName: ${n}\nService: ${s}\nPreferred date: ${d}\nDetails: ${t || '-'}`;
   const url = 'https://wa.me/233534349054?text=' + encodeURIComponent(msg);
   $('#err').textContent = '';
   $('#fb').innerHTML = `WhatsApp should open with your message ready. Press <b>Send</b> inside WhatsApp to finish. Nothing is sent until you do. Did it not open? <a href="${url}" target="_blank" rel="noopener">Open WhatsApp here</a> or message +233 53 434 9054.`;

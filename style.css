@@ -53,3 +53,8 @@ dialog{border:0;border-radius:24px;padding:18px;max-width:min(94vw,440px);width:
 dialog label{display:block;margin:10px 0;font-weight:700}dialog input,dialog select,dialog textarea{display:block;width:100%;margin-top:4px;padding:10px;font:inherit;border:3px solid #ddd;border-radius:12px}
 .send{width:100%;background:#25d366;font-weight:700;color:#053b1a}.ghost{width:100%;margin-top:8px}#err{color:#c62828;font-weight:700}.fb{font-size:.85rem}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+dialog h2{text-align:center;margin:.3em 0}.dl{display:block;height:64px;margin:0 auto;background:#4a148c;border-radius:14px;padding:6px}
+.t3{display:grid;grid-template-columns:repeat(3,84px);gap:8px;justify-content:center;margin:10px auto}.t3 button{height:84px;font-size:2.4rem;padding:0}
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:320px;margin:10px auto}.sim button{min-height:120px}.sim .fl{filter:brightness(1.7) saturate(1.4);transform:scale(.95)}
+.mg{display:grid;grid-template-columns:repeat(3,92px);gap:10px;justify-content:center;margin:10px auto}.mg button{height:92px;font-size:2.6rem;padding:0;background:#8d6e63}
