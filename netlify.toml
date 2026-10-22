@@ -1,0 +1,3 @@
+# Static site: no build step needed. Netlify publishes this folder as-is.
+[build]
+  publish = "."

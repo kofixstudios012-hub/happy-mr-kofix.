@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Happy Mr Kofix – Kids Games</title>
+<meta name="description" content="Happy Mr Kofix: 20 free kids games. No login, no ads, no payments.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <button id="home" class="ib" hidden aria-label="Home">🏠</button>
+  <h1>Happy Mr Kofix</h1>
+  <button id="mus" class="ib" aria-label="Music on/off" title="Music">🎵</button>
+  <button id="snd" class="ib" aria-label="Sound effects on/off" title="Sounds">🔊</button>
+  <button id="book" class="bk">📸 Book Photography</button>
+  <!-- Replace assets/kofix-logo.png to change the logo. The app still runs if it is missing. -->
+  <img id="logo" src="assets/kofix-logo.png" alt="Kofix logo" onerror="this.style.display='none'">
+</header>
+<main id="app"></main>
+<footer><a href="#" id="credit">Created by Kofix | Photographer &amp; App Developer</a></footer>
+
+<dialog id="dlg">
+  <form id="bf" novalidate>
+    <h2>📸 Book Kofix Photography</h2>
+    <label>Full name<input name="n" required autocomplete="name"></label>
+    <label>Photography service required
+      <select name="s" required>
+        <option value="">Choose…</option><option>Wedding</option><option>Portrait</option><option>Event</option>
+        <option>Fashion</option><option>Commercial</option><option>Corporate</option><option>Maternity</option>
+        <option>Music video</option><option>Other</option>
+      </select></label>
+    <label>Preferred booking date<input name="d" type="date" required></label>
+    <label>Short description or details<textarea name="t" rows="3"></textarea></label>
+    <p id="err" role="alert"></p>
+    <button class="send">Send Booking Request on WhatsApp</button>
+    <p id="fb" class="fb">This opens WhatsApp with your message ready. You press Send inside WhatsApp.</p>
+    <button type="button" id="cx" class="ghost">Close</button>
+  </form>
+</dialog>
+<script type="module" src="app.js"></script>
+</body>
+</html>
